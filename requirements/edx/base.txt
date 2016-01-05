@@ -96,6 +96,9 @@ lxml==3.4.4
 # Used for shopping cart's pdf invoice/receipt generation
 reportlab==3.1.44
 
+# Used for ecommerce's PDF invoice/receipt generation
+xhtml2pdf==0.0.6
+
 # Used for extracting/parsing pdf text
 pdfminer==20140328
 
