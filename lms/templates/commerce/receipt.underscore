@@ -10,9 +10,10 @@
     <% if ( receipt ) { %>
     <div class="list-info">
       <div class="info-item payment-info">
-        <div class="copy">
-          <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %></p>
-        </div>
+        <nav class="nav-wizard">
+          <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %>
+	  <a class="next action-primary right" href="../invoice/?orderNum=<%- receipt.orderNum %>" target="_blank"><%- gettext( "Print" ) %></a></p>
+        </nav>
 
         <div class="wrapper-report">
           <table class="report report-receipt">
