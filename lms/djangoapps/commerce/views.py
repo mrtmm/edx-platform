@@ -29,7 +29,7 @@ def checkout_error(_request):
     return render_to_response("commerce/checkout_error.html", context)
 
 
-def _view_receipt_or_invoice(request, page_title, template):
+def _view_receipt_or_invoice(request, page_title, template, disable_header=False, disable_footer=False):
     """Render a receipt either as a receipt for the screen, or as a
 printable invoice."""
     is_payment_complete = True
@@ -72,6 +72,8 @@ printable invoice."""
         'payment_support_email': payment_support_email,
         'username': request.user.username,
         'nav_hidden': True,
+        'disable_header': disable_header,
+        'disable_footer': disable_footer,
     }
     return render_to_response(template, context)
 
@@ -89,4 +91,6 @@ def checkout_invoice(request):
     """ Printable invoice view. """
     return _view_receipt_or_invoice(request,
                                     _('Invoice'),
-                                    'commerce/checkout_invoice.html')
+                                    'commerce/checkout_invoice.html',
+                                    disable_header=True,
+                                    disable_footer=True)
