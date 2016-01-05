@@ -29,12 +29,9 @@ def checkout_error(_request):
     return render_to_response("commerce/checkout_error.html", context)
 
 
-@csrf_exempt
-@login_required
-def checkout_receipt(request):
-    """ Receipt view. """
-
-    page_title = _('Receipt')
+def _view_receipt_or_invoice(request, page_title, template):
+    """Render a receipt either as a receipt for the screen, or as a
+printable invoice."""
     is_payment_complete = True
     payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     payment_support_link = '<a href=\"mailto:{email}\">{email}</a>'.format(email=payment_support_email)
@@ -76,4 +73,20 @@ def checkout_receipt(request):
         'username': request.user.username,
         'nav_hidden': True,
     }
-    return render_to_response('commerce/checkout_receipt.html', context)
+    return render_to_response(template, context)
+
+@csrf_exempt
+@login_required
+def checkout_receipt(request):
+    """ Receipt view. """
+    return _view_receipt_or_invoice(request,
+                                    _('Receipt'),
+                                    'commerce/checkout_receipt.html')
+
+@csrf_exempt
+@login_required
+def checkout_invoice(request):
+    """ Printable invoice view. """
+    return _view_receipt_or_invoice(request,
+                                    _('Invoice'),
+                                    'commerce/checkout_invoice.html')

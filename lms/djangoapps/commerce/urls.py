@@ -11,4 +11,5 @@ urlpatterns = patterns(
     url(r'^checkout/cancel/$', views.checkout_cancel, name='checkout_cancel'),
     url(r'^checkout/error/$', views.checkout_error, name='checkout_error'),
     url(r'^checkout/receipt/$', views.checkout_receipt, name='checkout_receipt'),
+    url(r'^checkout/invoice/$', views.checkout_invoice, name='checkout_invoice'),
 )
