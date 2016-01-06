@@ -1496,8 +1496,8 @@ def _do_create_account(form, custom_form=None):
     registration.register(user)
 
     profile_fields = [
-        "name", "level_of_education", "gender", "mailing_address", "city", "country", "goals",
-        "year_of_birth"
+        "name", "level_of_education", "gender", "mailing_address",
+        "phone_number", "vatin", "city", "country", "goals", "year_of_birth"
     ]
     profile = UserProfile(
         user=user,

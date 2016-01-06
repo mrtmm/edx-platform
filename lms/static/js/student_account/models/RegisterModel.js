@@ -13,6 +13,8 @@
                 gender: '',
                 year_of_birth: '',
                 mailing_address: '',
+                phone_number: '',
+                vatin: '',
                 goals: ''
             },
             ajaxType: '',

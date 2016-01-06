@@ -165,6 +165,8 @@ class RegistrationView(APIView):
         "year_of_birth",
         "level_of_education",
         "mailing_address",
+        "phone_number",
+        "vatin",
         "goals",
         "honor_code",
         "terms_of_service",
@@ -562,6 +564,48 @@ class RegistrationView(APIView):
             "mailing_address",
             label=mailing_address_label,
             field_type="textarea",
+            required=required
+        )
+
+    def _add_phone_number_field(self, form_desc, required=True):
+        """Add a phone number field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's phone number.
+        phone_number_label = _(u"Phone number")
+
+        form_desc.add_field(
+            "phone_number",
+            label=phone_number_label,
+            field_type="text",
+            required=required
+        )
+
+    def _add_vatin_field(self, form_desc, required=True):
+        """Add a VAT identification number field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's VAT identification number.
+        phone_number_label = _(u"VAT Identification Number")
+
+        form_desc.add_field(
+            "vatin",
+            label=phone_number_label,
+            field_type="text",
             required=required
         )
 

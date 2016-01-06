@@ -77,6 +77,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "date_joined": user.date_joined.replace(microsecond=0),
             "is_active": user.is_active,
             "bio": AccountLegacyProfileSerializer.convert_empty_to_None(profile.bio),
+            "city": profile.city,
             "country": AccountLegacyProfileSerializer.convert_empty_to_None(profile.country.code),
             "profile_image": AccountLegacyProfileSerializer.get_profile_image(
                 profile,
@@ -94,6 +95,8 @@ class UserReadOnlySerializer(serializers.Serializer):
             "year_of_birth": profile.year_of_birth,
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
+            "phone_number": unicode(profile.phone_number),
+            "vatin": profile.vatin,
             "requires_parental_consent": profile.requires_parental_consent(),
             "account_privacy": self._get_profile_visibility(profile, user),
         }
@@ -162,12 +165,14 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     profile_image = serializers.SerializerMethodField("_get_profile_image")
     requires_parental_consent = serializers.SerializerMethodField()
     language_proficiencies = LanguageProficiencySerializer(many=True, required=False)
+    vatin = serializers.CharField(allow_blank=True)
 
     class Meta(object):
         model = UserProfile
         fields = (
-            "name", "gender", "goals", "year_of_birth", "level_of_education", "country",
-            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies"
+            "name", "gender", "goals", "year_of_birth", "level_of_education", "city",
+            "country", "mailing_address", "phone_number", "vatin", "bio",
+            "profile_image", "requires_parental_consent", "language_proficiencies"
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()
@@ -187,6 +192,18 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
+        return value
+
+    def validate_vatin(self, value):
+        """ Enforce via VAT service. """
+        from stdnum.exceptions import ValidationError
+        from stdnum.eu.vat import check_vies
+        try:
+            result = check_vies(value)
+        except ValidationError:
+            raise serializers.ValidationError("Invalid VAT identification number.")
+        if not result.valid:
+            raise serializers.ValidationError("Invalid VAT identification number.")
         return value
 
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument

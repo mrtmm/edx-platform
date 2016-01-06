@@ -178,7 +178,9 @@ class AccountCreationForm(forms.Form):
             "mailing_address": _("Your mailing address is required"),
             "goals": _("A description of your goals is required"),
             "city": _("A city is required"),
-            "country": _("A country is required")
+            "country": _("A country is required"),
+            "phone_number": _("A phone number is required"),
+            "vatin": _("A VAT Identification Number is required")
         }
         for field_name, field_value in extra_fields.items():
             if field_name not in self.fields:

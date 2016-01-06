@@ -83,6 +83,14 @@
                             })
                         },
                         {
+                            view: new FieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('City'),
+                                valueAttribute: 'city',
+                                persistChanges: true
+                            })
+                        },
+                        {
                             view: new FieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 required: true,
@@ -97,6 +105,22 @@
                 {
                     title: gettext('Additional Information (optional)'),
                     fields: [
+                        {
+                            view: new FieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('Phone number'),
+                                valueAttribute: 'phone_number',
+                                persistChanges: true
+                            })
+                        },
+                        {
+                            view: new FieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('VAT Identification Number'),
+                                valueAttribute: 'vatin',
+                                persistChanges: true
+                            })
+                        },
                         {
                             view: new FieldViews.DropdownFieldView({
                                 model: userAccountModel,

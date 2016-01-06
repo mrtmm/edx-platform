@@ -45,6 +45,7 @@ class AccountView(APIView):
 
             * bio: null or textual representation of user biographical
               information ("about me").
+            * city: The user's city.
             * country: An ISO 3166 country code or null.
             * date_joined: The date the account was created, in the string
               format provided by datetime. For example, "2014-08-26T17:52:11Z".
@@ -81,6 +82,10 @@ class AccountView(APIView):
 
             * mailing_address: The textual representation of the user's mailing
               address, or null.
+            * phone_number: The textual representation of the user's phone
+              number, or null.
+            * vatin: The textual representation of the user's VAT
+              identification number, or null.
             * name: The full name of the user.
             * profile_image: A JSON representation of a user's profile image
               information. This representation has the following keys.

@@ -215,6 +215,20 @@ from student.models import UserProfile
     </li>
     % endif
 
+    % if settings.REGISTRATION_EXTRA_FIELDS['phone_number'] != 'hidden':
+    <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['phone_number']} text" id="field-phone-number">
+      <label for="phone-number">${_("Phone Number")}</label>
+      <input id="phone-number" type="text" name="phone_number" value="" placeholder="${_('example: +44 20 7946 0680')}" aria-describedby="phone-number-tip" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['phone_number'] == 'required' else ''} />
+    </li>
+    % endif
+
+    % if settings.REGISTRATION_EXTRA_FIELDS['vatin'] != 'hidden':
+    <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['vatin']} text" id="field-vatin">
+      <label for="vatin">${_('VAT Identification Number')}</label>
+      <input id="vatin" type="text" name="vatin" value="" placeholder="${_('example: ATU99999999')}" aria-describedby="vatin-tip" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['vatin'] == 'required' else ''} />
+    </li>
+    % endif
+
     % if settings.REGISTRATION_EXTRA_FIELDS['goals'] != 'hidden':
     <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['goals']} text" id="field-goals">
       <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=platform_name)}</label>

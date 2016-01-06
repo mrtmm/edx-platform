@@ -99,6 +99,11 @@ reportlab==3.1.44
 # Used for ecommerce's PDF invoice/receipt generation
 xhtml2pdf==0.0.6
 
+# Ecommerce-related field validation
+django-phonenumber-field==1.0.0
+suds==0.4
+python-stdnum==1.2
+
 # Used for extracting/parsing pdf text
 pdfminer==20140328
 

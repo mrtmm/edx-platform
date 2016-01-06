@@ -2131,6 +2131,8 @@ REGISTRATION_EXTRA_FIELDS = {
     'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
+    'phone_number': 'hidden',
+    'vatin': 'hidden'
 }
 
 ########################## CERTIFICATE NAME ########################
@@ -2532,6 +2534,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "year_of_birth",
         "level_of_education",
         "mailing_address",
+        "phone_number",
+        "vatin",
         "requires_parental_consent",
         "account_privacy",
     ]

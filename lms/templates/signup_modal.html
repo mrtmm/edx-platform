@@ -117,6 +117,16 @@ import calendar
 	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
           % endif
 
+          % if settings.REGISTRATION_EXTRA_FIELDS['phone_number'] != 'hidden':
+          <label data-field="phone_number" for="signup_phone_number">${_('Phone number')} + ' *'</label>
+          <input id="signup_phone_number" type="email" name="phone_number" placeholder="${_('e.g. +44 20 7946 0680')}" ${'required' if settings.REGISTRATION_EXTRA_FIELDS['phone_number'] == 'required' else ''} />
+          % endif
+
+          % if settings.REGISTRATION_EXTRA_FIELDS['vatin'] != 'hidden':
+          <label data-field="vatin" for="signup_vatin">${_('VAT Identification Number')} + ' *'</label>
+          <input id="signup_vatin" type="text" name="vatin" placeholder="${_('e.g. ATU99999999')}" ${'required' if settings.REGISTRATION_EXTRA_FIELDS['vatin'] == 'required' else ''} />
+          % endif
+
           % if settings.REGISTRATION_EXTRA_FIELDS['goals'] != 'hidden':
           <label data-field="goals" for="signup_goals">${_("Goals in signing up for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
 	    <textarea name="goals" id="signup_goals"></textarea>

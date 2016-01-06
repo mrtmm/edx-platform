@@ -37,6 +37,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django.core.cache import cache
 from django_countries.fields import CountryField
+from phonenumber_field.modelfields import PhoneNumberField
 import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
@@ -273,6 +274,8 @@ class UserProfile(models.Model):
     mailing_address = models.TextField(blank=True, null=True)
     city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
+    phone_number = PhoneNumberField(blank=True, null=True)
+    vatin = models.CharField(blank=True, null=True, max_length=14, db_index=False)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
