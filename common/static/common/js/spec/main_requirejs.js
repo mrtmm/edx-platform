@@ -40,7 +40,9 @@
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'URI': 'js/vendor/URI.min',
             'draggabilly': 'js/vendor/draggabilly',
-            'hls': 'common/js/vendor/hls'
+            'hls': 'common/js/vendor/hls',
+            'xblock': 'js/xblock/core',
+            'xblock.runtime': 'coffee/src/xblock/runtime.v1'
         },
         shim: {
             'gettext': {
@@ -154,6 +156,14 @@
             },
             'sinon': {
                 exports: 'sinon'
+            },
+            "xblock": {
+                deps: ['jquery', 'jquery.immediateDescendents'],
+                exports: "XBlock"
+            },
+            "xblock.runtime": {
+                deps: ['xblock'],
+                exports: "XBlock.Runtime"
             }
         }
     });
@@ -168,7 +178,9 @@
         'common/js/spec/components/progress_circle_view_spec.js',
         'common/js/spec/components/search_field_spec.js',
         'common/js/spec/components/view_utils_spec.js',
-        'common/js/spec/utils/edx.utils.validate_spec.js'
+        'common/js/spec/utils/edx.utils.validate_spec.js',
+        'common/js/spec/xblock/core_spec.js',
+        'common/js/spec/xblock/runtime.v1_spec.js'
     ];
 
     for (i = 0; i < testFiles.length; i++) {
