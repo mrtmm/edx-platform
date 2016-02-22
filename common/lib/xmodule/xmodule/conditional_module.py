@@ -4,9 +4,11 @@ some xmodules by conditions.
 
 import json
 import logging
+import hashlib
 from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
+from collections import OrderedDict
 
 from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
@@ -107,6 +109,15 @@ class ConditionalModule(ConditionalFields, XModule):
             )
         )
 
+    def _hash_resource(self, resource):
+        """
+        Hash a :class:`xblock.fragment.FragmentResource
+        """
+        md5 = hashlib.md5()
+        for data in resource:
+            md5.update(repr(data))
+        return md5.hexdigest()
+
     @lazy
     def required_modules(self):
         return [self.system.get_module(descriptor) for
@@ -148,7 +159,7 @@ class ConditionalModule(ConditionalFields, XModule):
         })
 
     def handle_ajax(self, _dispatch, _data):
-        """This is called by courseware.moduleodule_render, to handle
+        """This is called by courseware.module_render, to handle
         an AJAX call.
         """
         if not self.is_condition_satisfied():
@@ -160,9 +171,17 @@ class ConditionalModule(ConditionalFields, XModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        html = [child.render(STUDENT_VIEW).content for child in self.get_display_items()]
+        html = []
+        hashed_resources = OrderedDict()
+        for child in self.get_display_items():
+            fragment = child.render(STUDENT_VIEW)
+            html.append(fragment.content)
+            for resource in fragment.resources:
+                hashed_resources[self._hash_resource(resource)] = resource
 
-        return json.dumps({'html': html})
+        return json.dumps({
+            'html': html,
+            'resources': hashed_resources.items()})
 
     def get_icon_class(self):
         new_class = 'other'

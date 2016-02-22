@@ -66,5 +66,52 @@ class @JavascriptLoader
         # just call the completion callback directly, without reloading the file
         completionHandlerGenerator(index)()
       $(placeholder).remove()
-        
-      
+
+  # loadXBlockResources:
+  #   With the provided XBlock resources:
+  #     1) Explicitly attach the resource to the <head> of document
+  #     2) Explicitly wait for each resource to be loaded
+  #     3) Return to callback function when all resources loaded
+  @loadXBlockResources: (resources, callback=null) ->
+    loader = (r) ->
+      kind = r[1][0]
+      data = r[1][1]
+      mimetype = r[1][2]
+      placement = r[1][3]
+
+      if mimetype is 'application/javascript'
+        e = document.createElement('script')
+        if kind is 'url'
+          e.setAttribute('src', data)
+          e.setAttribute('type', mimetype)
+        else
+          e.appendChild(document.createTextNode(data))
+      else if mimetype is 'text/css'
+        if kind is 'url'
+          e = document.createElement('link')
+          e.setAttribute('rel', 'stylesheet')
+          e.setAttribute('href', data)
+          e.setAttribute('type', mimetype)
+        else
+          e = document.createElement('style')
+          e.setAttribute('type', mimetype)
+          e.appendChild(document.createTextNode(data))
+      else
+        console.log "Unknown mimetype #{mimetype}"
+        return
+
+      deferred = $.Deferred()
+
+      e.onload = () ->
+        deferred.resolve()
+
+      $('head')[0].appendChild(e)
+
+      return deferred.promise()
+
+    loaders = []
+    for resource in resources
+      loaders.push(loader(resource))
+
+    $.when.apply(null, loaders).done ->
+      callback() if callback?

@@ -17,6 +17,10 @@ class @Conditional
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
         @el.html ''
         @el.append(i) for i in response.html
+        JavascriptLoader.loadXBlockResources response.resources, () =>
+          # Don't initialize XBlocks until all resources have been loaded,
+          # otherwise XBlock.constructBlock() may call undefined init functions.
+          @initialize()
 
         parentEl = $(element).parent()
         parentId = parentEl.attr 'id'
@@ -32,6 +36,7 @@ class @Conditional
           else
             $(element).show()
 
-        # The children are rendered with a new request, so they have a different request-token.
-        # Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
-        XBlock.initializeBlocks(@el)
+  initialize: =>
+    # The children are rendered with a new request, so they have a different request-token.
+    # Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
+    XBlock.initializeBlocks(@el)
