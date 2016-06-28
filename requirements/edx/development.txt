@@ -44,7 +44,7 @@ git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536ff
 git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
 -e common/lib/xmodule
 alabaster==0.7.11         # via sphinx
-amqp==1.4.9
+git+https://github.com/arbrandes/py-amqp.git@v1.4.9hastexo#egg=amqp==1.4.9hastexo
 analytics-python==1.1.0
 anyjson==0.3.3
 apipkg==1.4
@@ -55,7 +55,7 @@ asn1crypto==0.24.0
 astroid==1.5.2
 atomicwrites==1.1.5
 attrs==17.4.0
-babel==1.3
+babel==2.3.4
 backports.functools-lru-cache==1.5
 beautifulsoup4==4.6.0
 beautifulsoup==3.2.1
@@ -289,7 +289,7 @@ radon==2.2.0
 redis==2.10.6
 reportlab==3.1.44
 requests-oauthlib==0.6.1
-requests==2.9.1
+requests==2.19.1
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==1.3
@@ -316,7 +316,7 @@ sphinx==1.7.5
 sphinxcontrib-websupport==1.1.0  # via sphinx
 splinter==0.8.0
 sqlparse==0.2.4           # via django-debug-toolbar
-stevedore==1.10.0
+stevedore==1.21.0
 sure==1.4.11
 sympy==0.7.1
 testfixtures==6.2.0
