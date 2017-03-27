@@ -392,6 +392,9 @@ FEATURES = {
     # Whether to check the "Notify users by email" checkbox in the batch enrollment form
     # in the instructor dashboard.
     'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
+
+    # Enable loading of external app URLs under the "webhooks" namespace.
+    'ENABLE_WEBHOOKS': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -3211,5 +3214,10 @@ COURSE_ENROLLMENT_MODES = {
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
+
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+
+############## Settings for Webhooks ######################
+
+WEBHOOK_APPS = ()
