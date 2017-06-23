@@ -4,3 +4,4 @@
 
 # OpenStack swift backend for django storage API
 django-storage-swift==1.2.15
+python-swiftclient==3.3.0
