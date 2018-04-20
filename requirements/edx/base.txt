@@ -9,6 +9,7 @@ beautifulsoup==3.2.1
 bleach==1.4
 html5lib==0.999
 boto==2.39.0
+-e git+https://github.com/arbrandes/py-amqp.git@v1.4.9hastexo#egg=amqp==1.4.9hastexo
 celery==3.1.18
 cryptography==1.5.3
 cssselect==0.9.1
