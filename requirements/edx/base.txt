@@ -67,7 +67,7 @@ GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
 help-tokens==1.0.2
-httpretty==0.8.3
+httpretty==0.9.5
 lazy==1.1
 mako==1.0.2
 Markdown==2.2.1
@@ -99,7 +99,7 @@ social-auth-core==1.4.0
 pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.12
-requests==2.12.5
+requests==2.19.1
 requests-oauthlib==0.4.1
 rules==1.1.1
 scipy==0.14.0
