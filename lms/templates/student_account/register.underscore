@@ -39,15 +39,11 @@
                     </button>
                 <% } %>
             </div>
-            <div class="section-title lines">
-                <h3>
-                    <span class="text"><%- gettext("or create a new one here") %></span>
-                </h3>
-            </div>
         <% } %>
-    <% } %>
+    <% } else { %>
 
     <%= context.fields %>
 
     <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create account") %></button>
+    <% } %>
 </form>
