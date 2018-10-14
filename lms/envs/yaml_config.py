@@ -98,6 +98,7 @@ EMAIL_FILE_PATH = None
 MONGODB_LOG = {}
 SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
 ADDL_INSTALLED_APPS = []
+WEBHOOK_APPS = []
 LOCAL_LOGLEVEL = 'INFO'
 
 ##############################################################
@@ -230,6 +231,10 @@ LANGUAGE_DICT = dict(LANGUAGES)
 # Additional installed apps
 for app in ADDL_INSTALLED_APPS:
     INSTALLED_APPS += (app,)
+
+# Webhook apps
+for app in WEBHOOK_APPS:
+    WEBHOOK_APPS += (app,)
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=LOGGING_ENV,
