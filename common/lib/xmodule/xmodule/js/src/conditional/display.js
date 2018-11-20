@@ -18,37 +18,121 @@
       }
     }
 
+    Conditional.prototype.loadJavaScript = function(url) {
+      var deferred = $.Deferred();
+      $.getScript(url).done(function() {
+        deferred.resolve();
+      }).fail(function() {
+        deferred.reject();
+      });
+      return deferred.promise();
+    };
+
+    Conditional.prototype.loadResource = function(resource) {
+      var $head = $('head'),
+        mimetype = resource.mimetype,
+        kind = resource.kind,
+        placement = resource.placement,
+        data = resource.data;
+      if (mimetype === 'text/css') {
+        if (kind === 'text') {
+          $head.append("<style type='text/css'>" + data + '</style>');
+        } else if (kind === 'url') {
+          $head.append("<link rel='stylesheet' href='" + data + "' type='text/css'>");
+        }
+      } else if (mimetype === 'application/javascript') {
+        if (kind === 'text') {
+          $head.append('<script>' + data + '</script>');
+        } else if (kind === 'url') {
+          return this.loadJavaScript(data);
+        }
+      } else if (mimetype === 'text/html') {
+        if (placement === 'head') {
+          $head.append(data);
+        }
+      }
+      // Return an already resolved promise for synchronous updates
+      return $.Deferred().resolve().promise();
+    };
+
+    Conditional.prototype.addXBlockFragmentResources = function(resources) {
+      var applyResource,
+        numResources,
+        deferred,
+        _this = this;
+      numResources = resources.length;
+      deferred = $.Deferred();
+      applyResource = function(index) {
+        var hash, resource, value, promise;
+        if (index >= numResources) {
+          deferred.resolve();
+          return;
+        }
+        value = resources[index];
+        hash = value[0];
+        if (!window.loadedXBlockResources) {
+          window.loadedXBlockResources = [];
+        }
+        if (_.indexOf(window.loadedXBlockResources, hash) < 0) {
+          resource = value[1];
+          promise = _this.loadResource(resource);
+          window.loadedXBlockResources.push(hash);
+          promise.done(function() {
+            applyResource(index + 1);
+          }).fail(function() {
+            deferred.reject();
+          });
+        } else {
+          applyResource(index + 1);
+        }
+      };
+      applyResource(0);
+      return deferred.promise();
+    };
+
+    Conditional.prototype.renderXBlockFragment = function(fragment) {
+      var html = fragment.html,
+        resources = fragment.resources
+        _this = this;
+
+      try {
+        return this.addXBlockFragmentResources(resources).done(function() {
+          _this.el.html(html);
+        });
+      } catch (e) {
+        console.error(e, e.stack);
+        return $.Deferred().resolve();
+      }
+    };
+
     Conditional.prototype.render = function(element) {
       return $.postWithPrefix(this.url + "/conditional_get", (function(_this) {
         return function(response) {
-          var i, j, len, parentEl, parentId, ref;
-          _this.el.html('');
-          ref = response.html;
-          for (j = 0, len = ref.length; j < len; j++) {
-            i = ref[j];
-            _this.el.append(i);
-          }
-          parentEl = $(element).parent();
-          parentId = parentEl.attr('id');
-          if (response.message === false) {
+          var i, j, len, parentEl, ref, promises, promise, fragment;
+          if (response.message !== undefined) {
+            _this.el.html('');
+            ref = response.html;
+            for (j = 0, len = ref.length; j < len; j++) {
+              i = ref[j];
+              _this.el.append(i);
+            }
+            parentEl = $(element).parent();
             if (parentEl.hasClass('vert')) {
-              parentEl.hide();
+              return parentEl.show();
             } else {
-              $(element).hide();
+              return $(element).show();
             }
           } else {
-            if (parentEl.hasClass('vert')) {
-              parentEl.show();
-            } else {
-              $(element).show();
+            promises = [];
+            for (j = 0, len = response.length; j < len; j++) {
+              fragment = response[j];
+              promise = _this.renderXBlockFragment(fragment);
+              promises.push(promise);
             }
+            return $.when.apply(null, promises).always(function() {
+              return XBlock.initializeBlocks(_this.el);
+            });
           }
-
-          /*
-          The children are rendered with a new request, so they have a different request-token.
-          Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
-           */
-          return XBlock.initializeBlocks(_this.el);
         };
       })(this));
     };

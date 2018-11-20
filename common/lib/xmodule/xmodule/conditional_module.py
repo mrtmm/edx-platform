@@ -4,11 +4,13 @@ some xmodules by conditions.
 
 import json
 import logging
+import hashlib
 
 from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
 from six import text_type
+from collections import OrderedDict
 
 from opaque_keys.edx.locator import BlockUsageLocator
 from web_fragments.fragment import Fragment
@@ -146,6 +148,14 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
         'voted': 'voted'  # poll_question attr
     }
 
+    def _hash_resource(self, resource):
+        """
+        Hash a :class:`xblock.fragment.FragmentResource`.
+        """
+        md5 = hashlib.md5()
+        md5.update(repr(resource))
+        return md5.hexdigest()
+
     @lazy
     def required_modules(self):
         return [self.system.get_module(descriptor) for
@@ -215,9 +225,19 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(self.conditional_message)})
 
-        html = [child.render(STUDENT_VIEW).content for child in self.get_display_items()]
+        response = []
+        for child in self.get_display_items():
+            fragment = child.render(STUDENT_VIEW)
 
-        return json.dumps({'html': html})
+            hashed_resources = OrderedDict()
+            if fragment.resources:
+                for resource in fragment.resources:
+                    hashed_resources[self._hash_resource(resource)] = resource._asdict()
+
+            response.append({'html': fragment.content,
+                             'resources': hashed_resources.items()})
+
+        return json.dumps(response)
 
     def get_icon_class(self):
         new_class = 'other'
