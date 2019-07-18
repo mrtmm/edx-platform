@@ -543,6 +543,7 @@ AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE
 
 HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 
+
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
 
@@ -596,3 +597,7 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+# Specific setting for the File Upload Service to store media in a bucket.
+FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
+FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)

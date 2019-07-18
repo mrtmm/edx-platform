@@ -142,6 +142,13 @@ urlpatterns = [
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
 ]
 
+# Include each webhook app's URLs, if enabled.
+if settings.FEATURES.get("ENABLE_WEBHOOKS"):
+    for app in settings.WEBHOOK_APPS:
+        urlpatterns += (
+            url(r'^webhooks/', include("%s.urls" % app, namespace=app)),
+        )
+
 # TODO: This needs to move to a separate urls.py once the student_account and
 # student views below find a home together
 if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):

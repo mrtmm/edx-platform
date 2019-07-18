@@ -24,7 +24,7 @@ COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 if 'TOXENV' in os.environ:
     PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
 else:
-    PYTHON_REQ_FILES = ['requirements/edx/development.txt']
+    PYTHON_REQ_FILES = ['requirements/edx/development.txt', 'requirements/edx/openstack.txt']
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
