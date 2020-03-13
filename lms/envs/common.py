@@ -406,6 +406,9 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
+
+    # Enable loading of external app URLs under the "webhooks" namespace.
+    'ENABLE_WEBHOOKS': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -3404,6 +3407,7 @@ CONTENT_TYPE_GATE_GROUP_IDS = {
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
+
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
@@ -3481,3 +3485,7 @@ USER_STATE_BATCH_SIZE = 5000
 from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
 INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.LMS))
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.COMMON)
+
+############## Settings for Webhooks ######################
+
+WEBHOOK_APPS = ()
