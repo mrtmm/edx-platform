@@ -49,22 +49,22 @@ class BadgrBackend(BadgeBackend):
     @lazy
     def _base_url(self):
         """
-        Base URL for all API requests.
+        Base URL for API requests that contain the issuer slug.
         """
-        return f"{settings.BADGR_BASE_URL}/v1/issuer/issuers/{settings.BADGR_ISSUER_SLUG}"
+        return "{}/v2/issuers/{}".format(settings.BADGR_BASE_URL, settings.BADGR_ISSUER_SLUG)
 
     @lazy
     def _badge_create_url(self):
         """
         URL for generating a new Badge specification
         """
-        return f"{self._base_url}/badges"
+        return "{}/badgeclasses".format(self._base_url)
 
     def _badge_url(self, slug):
         """
         Get the URL for a course's badge in a given mode.
         """
-        return f"{self._badge_create_url}/{slug}"
+        return "{}/v2/badgeclasses/{}".format(settings.BADGR_BASE_URL, slug)
 
     def _assertion_url(self, slug):
         """
@@ -120,7 +120,6 @@ class BadgrBackend(BadgeBackend):
         data = {
             'name': badge_class.display_name,
             'criteria': badge_class.criteria,
-            'slug': self._slugify(badge_class),
             'description': badge_class.description,
         }
         result = requests.post(
@@ -130,10 +129,10 @@ class BadgrBackend(BadgeBackend):
         self._log_if_raised(result, data)
         try:
             result_json = result.json()
-            if 'slug' in result_json:
-                badgr_server_slug = result_json['slug']
-                badge_class.badgr_server_slug = badgr_server_slug
-                badge_class.save()
+            badgr_badge_class = result_json['result'][0]
+            badgr_server_slug = badgr_badge_class.get('entityId')
+            badge_class.badgr_server_slug = badgr_server_slug
+            badge_class.save()
         except Exception as excep:
             LOGGER.error('Error on saving Badgr Server Slug of badge_class slug "{0}" with response json "{1}" : {2}'.format(badge_class.slug, result.json(), excep))
 
@@ -162,11 +161,20 @@ class BadgrBackend(BadgeBackend):
         Register an assertion with the Badgr server for a particular user for a specific class.
         """
         data = {
-            'email': user.email,
-            'evidence': evidence_url,
+            "recipient": {
+                "identity": user.email,
+                "type": "email"
+            },
+            "evidence": [
+                {
+                    "url": evidence_url
+                }
+            ]
         }
         response = requests.post(
-            self._assertion_url(badge_class.badgr_server_slug), headers=self._get_headers(), data=data,
+            self._assertion_url(badge_class.badgr_server_slug),
+            headers=self._get_headers(),
+            json=data,
             timeout=settings.BADGR_TIMEOUT
         )
         self._log_if_raised(response, data)
