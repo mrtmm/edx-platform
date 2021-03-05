@@ -84,7 +84,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Verify the a headers dict from a requests call matches the proper auth info.
         """
-        assert headers == {'Authorization': 'Token 12345'}
+        assert headers == {'Authorization': 'Bearer 12345'}
 
     def test_get_headers(self):
         """
