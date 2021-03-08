@@ -2,8 +2,7 @@
 Tests for BadgrBackend
 """
 
-
-from datetime import datetime
+import datetime
 from unittest.mock import Mock, call, patch
 
 import ddt
@@ -16,14 +15,17 @@ from common.djangoapps.track.tests import EventTrackingTestCase
 from lms.djangoapps.badges.backends.badgr import BadgrBackend
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
+from edx_django_utils.cache import TieredCache
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 BADGR_SETTINGS = {
-    'BADGR_API_TOKEN': '12345',
     'BADGR_BASE_URL': 'https://example.com',
     'BADGR_ISSUER_SLUG': 'test-issuer',
+    'BADGR_USERNAME': 'example@example.com',
+    'BADGR_PASSWORD': 'password',
+    'BADGR_TOKENS_CACHE_KEY': 'badgr-test-cache-key'
 }
 
 # Should be the hashed result of test_slug as the slug, and test_component as the component
@@ -47,8 +49,8 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(
             org='edX', course='course_test', run='test_run', display_name='Badged',
-            start=datetime(year=2015, month=5, day=19),
-            end=datetime(year=2015, month=5, day=20)
+            start=datetime.datetime(year=2015, month=5, day=19),
+            end=datetime.datetime(year=2015, month=5, day=20)
         )
         self.user = UserFactory.create(email='example@example.com')
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.location.course_key, mode='honor')
@@ -59,6 +61,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=self.course.location.course_key, issuing_component=''
         )
         self.no_course_badge_class = BadgeClassFactory.create()
+        TieredCache.dangerous_clear_all_tiers()
 
     @lazy
     def handler(self):
@@ -91,6 +94,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Check to make sure the handler generates appropriate HTTP headers.
         """
+        self.handler._get_access_token = Mock(return_value = '12345')
         self.check_headers(self.handler._get_headers())  # lint-amnesty, pylint: disable=no-member
 
     @patch('requests.post')
@@ -98,6 +102,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Verify badge spec creation works.
         """
+        self.handler._get_access_token = Mock(return_value = '12345')
         self.handler._create_badge(self.badge_class)
         args, kwargs = post.call_args
         assert args[0] == 'https://example.com/v1/issuer/issuers/test-issuer/badges'
@@ -136,6 +141,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response.status_code = 200
         get.return_value = response
         assert 'test_componenttest_slug' not in BadgrBackend.badges
+        self.handler._get_access_token = Mock(return_value = '12345')
         self.handler._create_badge = Mock()
         self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         assert get.called
@@ -153,6 +159,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response.status_code = 404
         get.return_value = response
         assert BADGR_SERVER_SLUG not in BadgrBackend.badges
+        self.handler._get_access_token = Mock(return_value = '12345')
         self.handler._create_badge = Mock()
         self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         assert self.handler._create_badge.called
@@ -171,6 +178,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response.json.return_value = result
         post.return_value = response
         self.recreate_tracker()
+        self.handler._get_access_token = Mock(return_value = '12345')
         self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')  # lint-amnesty, pylint: disable=no-member
         args, kwargs = post.call_args
         assert args[0] == ((
@@ -199,3 +207,92 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
                 'issuer': 'https://example.com/v1/issuer/issuers/test-issuer',
             }
         }, self.get_event())
+
+    @patch('requests.post')
+    def test_get_new_tokens(self, post):
+        result = {
+            'access_token': '12345',
+            'refresh_token': '67890',
+            'expires_in': 86400,
+        }
+        response = Mock()
+        response.json.return_value = result
+        post.return_value = response
+        self.handler._get_and_cache_oauth_tokens()
+        args, kwargs = post.call_args
+        assert args[0] == 'https://example.com/o/token'
+        assert kwargs['data'] == {'username': 'example@example.com',
+                                  'password': 'password'}
+
+    @patch('requests.post')
+    def test_renew_tokens(self, post):
+        result = {
+            'access_token': '12345',
+            'refresh_token': '67890',
+            'expires_in': 86400,
+        }
+        response = Mock()
+        response.json.return_value = result
+        post.return_value = response
+        self.handler._get_and_cache_oauth_tokens(refresh_token='67890')
+        args, kwargs = post.call_args
+        assert args[0] == 'https://example.com/o/token'
+        assert kwargs['data'] == {'grant_type': 'refresh_token',
+                                  'refresh_token': '67890'}
+
+    def test_get_access_token_from_cache_valid(self):
+        encrypted_access_token = self.handler._encrypt_token('12345')
+        encrypted_refresh_token = self.handler._encrypt_token('67890')
+        tokens = {
+            'access_token': encrypted_access_token,
+            'refresh_token': encrypted_refresh_token,
+            'expires_at': datetime.datetime.utcnow() + datetime.timedelta(seconds=20)
+        }
+        TieredCache.set_all_tiers('badgr-test-cache-key', tokens, None)
+
+        access_token = self.handler._get_access_token()
+        assert access_token == self.handler._decrypt_token(
+            tokens.get('access_token'))
+
+    @patch('requests.post')
+    def test_get_access_token_from_cache_expired(self, post):
+        encrypted_access_token = self.handler._encrypt_token('12345')
+        encrypted_refresh_token = self.handler._encrypt_token('67890')
+        tokens = {
+            'access_token': encrypted_access_token,
+            'refresh_token': encrypted_refresh_token,
+            'expires_at': datetime.datetime.utcnow()
+        }
+        TieredCache.set_all_tiers('badgr-test-cache-key', tokens, None)
+        result = {
+            'access_token': '12345',
+            'refresh_token': '67890',
+            'expires_in': 86400,
+        }
+        response = Mock()
+        response.json.return_value = result
+        post.return_value = response
+        access_token = self.handler._get_access_token()
+        args, kwargs = post.call_args
+        assert args[0] == 'https://example.com/o/token'
+        assert kwargs['data'] == {'grant_type': 'refresh_token',
+                                  'refresh_token': self.handler._decrypt_token(
+                                        tokens.get('refresh_token'))}
+        assert access_token == result.get('access_token')
+
+    @patch('requests.post')
+    def test_get_access_token_from_cache_none(self, post):
+        result = {
+            'access_token': '12345',
+            'refresh_token': '67890',
+            'expires_in': 86400,
+        }
+        response = Mock()
+        response.json.return_value = result
+        post.return_value = response
+        access_token = self.handler._get_access_token()
+        args, kwargs = post.call_args
+        assert args[0] == 'https://example.com/o/token'
+        assert kwargs['data'] == {'username': 'example@example.com',
+                                  'password': 'password'}
+        assert access_token == result.get('access_token')
