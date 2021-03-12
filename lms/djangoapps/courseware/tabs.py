@@ -356,6 +356,9 @@ def get_course_tab_list(user, course):
             continue
         course_tab_list.append(tab)
 
+        if tab.name == 'Course':
+            tab.name = 'Content'
+
     # Add in any dynamic tabs, i.e. those that are not persisted
     course_tab_list += _get_dynamic_tabs(course, user)
     return course_tab_list

@@ -244,7 +244,7 @@ class CourseStartDate(DateSummary):
     Displays the start date of the course.
     """
     css_class = 'start-date'
-    title = ugettext_lazy('Course Starts')
+    title = ugettext_lazy('Starts')
 
     @property
     def date(self):
@@ -273,7 +273,7 @@ class CourseStartDate(DateSummary):
                     Text(_(
                         "Don't forget to add a calendar reminder!"
                     )),
-                    title=Text(_(u"Course starts in {time_remaining_string} on {course_start_date}.")).format(
+                    title=Text(_(u"Starts in {time_remaining_string} on {course_start_date}.")).format(
                         time_remaining_string=self.time_remaining_string,
                         course_start_date=self.long_date_html,
                     )
@@ -281,7 +281,7 @@ class CourseStartDate(DateSummary):
             else:
                 CourseHomeMessages.register_info_message(
                     request,
-                    Text(_(u"Course starts in {time_remaining_string} at {course_start_time}.")).format(
+                    Text(_(u"Starts in {time_remaining_string} at {course_start_time}.")).format(
                         time_remaining_string=self.time_remaining_string,
                         course_start_time=self.short_time_html,
                     )
@@ -293,7 +293,7 @@ class CourseEndDate(DateSummary):
     Displays the end date of the course.
     """
     css_class = 'end-date'
-    title = ugettext_lazy('Course End')
+    title = ugettext_lazy('End')
 
     @property
     def is_enabled(self):
@@ -306,8 +306,8 @@ class CourseEndDate(DateSummary):
             if is_active and CourseMode.is_eligible_for_certificate(mode):
                 return _('To earn a certificate, you must complete all requirements before this date.')
             else:
-                return _('After this date, course content will be archived.')
-        return _('This course is archived, which means you can review course content but it is no longer active.')
+                return _('After this date, the content will be archived.')
+        return _('This content is archived, which means you can review it but it is no longer active.')
 
     @property
     def date(self):
@@ -338,7 +338,7 @@ class CourseEndDate(DateSummary):
                 CourseHomeMessages.register_info_message(
                     request,
                     Text(self.description),
-                    title=Text(_(u'This course is ending in {time_remaining_string} on {course_end_date}.')).format(
+                    title=Text(_(u'Ending in {time_remaining_string} on {course_end_date}.')).format(
                         time_remaining_string=self.time_remaining_string,
                         course_end_date=self.long_date_html,
                     )
@@ -347,7 +347,7 @@ class CourseEndDate(DateSummary):
                 CourseHomeMessages.register_info_message(
                     request,
                     Text(self.description),
-                    title=Text(_(u'This course is ending in {time_remaining_string} at {course_end_time}.')).format(
+                    title=Text(_(u'Ending in {time_remaining_string} at {course_end_time}.')).format(
                         time_remaining_string=self.time_remaining_string,
                         course_end_time=self.short_time_html,
                     )
@@ -426,7 +426,7 @@ class CourseExpiredDate(DateSummary):
 
     @property
     def description(self):
-        return _('You lose all access to this course, including your progress.')
+        return _('You lose all access to this content, including your progress.')
 
     @property
     def title(self):
@@ -499,7 +499,7 @@ class CertificateAvailableDate(DateSummary):
                         learner_profile_name=_('Learner Profile'),
                     ),
                 ),
-                title=Text(_('We are working on generating course certificates.'))
+                title=Text(_('We are working on generating certificates.'))
             )
 
 

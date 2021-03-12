@@ -52,9 +52,9 @@ from openedx.features.course_experience.course_tools import HttpMethod
                 % if resume_course_url:
                     <a class="btn btn-primary action-resume-course" href="${resume_course_url}">
                         % if has_visited_course:
-                            <span data-action-type="resume">${_("Resume Course")}</span>
+                            <span data-action-type="resume">${_("Resume")}</span>
                         % else:
-                            <span data-action-type="start">${_("Start Course")}</span>
+                            <span data-action-type="start">${_("Start")}</span>
                         % endif
                     </a>
                 % endif

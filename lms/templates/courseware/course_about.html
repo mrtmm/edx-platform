@@ -82,7 +82,7 @@ from six import string_types
           <span class="register disabled">${_("You are enrolled in this course")}</span>
 
           %if show_courseware_link:
-            <strong>${_("View Course")}</strong>
+            <strong>${_("View Content")}</strong>
             </a>
           %endif
 
@@ -100,7 +100,7 @@ from six import string_types
         %elif allow_anonymous:
           %if show_courseware_link:
             <a href="${course_target}">
-            <strong>${_("View Course")}</strong>
+            <strong>${_("View Content")}</strong>
             </a>
           %endif
         %else:

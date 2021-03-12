@@ -90,7 +90,7 @@ def course_home_page_title(course):  # pylint: disable=unused-argument
     """
     Returns the title for the course home page.
     """
-    return _('Course')
+    return _('Content')
 
 
 def default_course_url_name(course_id):
